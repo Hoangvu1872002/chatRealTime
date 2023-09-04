@@ -8,7 +8,7 @@ import { addDoc, collection } from "firebase/firestore";
 import addDocument, { generateKeywords } from "../../firebase/services";
 
 const { Title } = Typography;
-// const fbProvider = new FacebookAuthProvider();
+const fbProvider = new FacebookAuthProvider();
 const googleProvider =  new GoogleAuthProvider();
 
 const Login = () => {
@@ -44,9 +44,9 @@ const Login = () => {
           <Button style={{ width: "100%", marginBottom: 5 }} onClick={() => handleFbLogin(googleProvider)}>
             Login by google
           </Button>
-          {/* <Button style={{ width: "100%" }} onClick={() => handleFbLogin(fbProvider)}>
+          <Button style={{ width: "100%" }} onClick={() => handleFbLogin(fbProvider)}>
             Login by facebook
-          </Button> */}
+          </Button>
         </Col>
       </Row>
     </div>

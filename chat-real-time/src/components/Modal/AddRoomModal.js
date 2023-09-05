@@ -2,11 +2,11 @@ import React, { useContext } from 'react';
 import { AppContext } from '../context/AppProvider';
 import { AuthContext } from '../context/AuthProvider';
 import addDocument from '../../firebase/services';
-import { Input, Modal, Form } from 'antd';
+import { Input, Modal, Form, Alert } from 'antd';
 
 
 export default function AddRoomModal() {
-  const { isAddRoomVisible, setIsAddRoomVisible } = useContext(AppContext);
+  const { isAddRoomVisible, setIsAddRoomVisible, rooms } = useContext(AppContext);
   const {
     user: { uid },
   } = useContext(AuthContext);
@@ -16,9 +16,18 @@ export default function AddRoomModal() {
     // handle logic
     // add new room to firestore
     // console.log(!!form.getFieldsValue().description || !!form.getFieldsValue().name);
-    if(!!form.getFieldsValue().description || !!form.getFieldsValue().name){
-      addDocument('rooms', { ...form.getFieldsValue(), members: [uid] });
-      setIsAddRoomVisible(false);
+    if(!!form.getFieldsValue().description && !!form.getFieldsValue().name){
+      let listNameRoom = [];
+       const a = rooms.map(item => item.name);
+       listNameRoom = [...listNameRoom, ...a]
+      console.log(listNameRoom);
+      const checkName = listNameRoom.find(item => item === form.getFieldsValue().name);
+      if(checkName){
+        alert('tên phòng đã tồn tại!')
+      }else{
+        addDocument('rooms', { ...form.getFieldsValue(), members: [uid], createBy: uid });
+        setIsAddRoomVisible(false);
+      }
     }else{
       setIsAddRoomVisible(true);
     }

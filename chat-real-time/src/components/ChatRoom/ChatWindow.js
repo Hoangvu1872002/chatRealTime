@@ -1,4 +1,4 @@
-import { UserAddOutlined } from "@ant-design/icons";
+import { UserAddOutlined, UserDeleteOutlined } from "@ant-design/icons";
 import { Avatar, Button, Form, Input, Tooltip, Alert } from "antd";
 import React, { useContext, useMemo, useState } from "react";
 import { styled } from "styled-components";
@@ -7,6 +7,8 @@ import { AppContext } from "../context/AppProvider";
 import addDocument from "../../firebase/services";
 import { AuthContext } from "../context/AuthProvider";
 import useFirestore from "../../hooks/useFirestore";
+import { deleteDoc, doc, updateDoc, writeBatch } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 const HeaderStyled = styled.div`
   display: flex;
@@ -71,13 +73,14 @@ const MessageListStyled = styled.div`
 `;
 
 const ChatWindow = () => {
-  const { selectedRoom, members, setIsInviteMemberVisible } =
+  const { selectedRoom, members, setIsInviteMemberVisible, setIsRemoveMemberVisible } =
     useContext(AppContext);
   const {
     user: { uid, photoURL, displayName },
   } = useContext(AuthContext);
 
   const [inputValue, setInputValue] = useState("");
+  
 
   const [form] = Form.useForm();
 
@@ -86,15 +89,21 @@ const ChatWindow = () => {
   };
 
   const handleonSubmit = () => {
-    addDocument("messages", {
-      text: inputValue,
-      uid,
-      photoURL,
-      roomId: selectedRoom.id,
-      displayName,
-    });
-    form.resetFields(["messages"]);
+    if(!inputValue){
+      alert("bạn chưa nhập tin nhắn!");
+    }else{
+      addDocument("messages", {
+        text: inputValue,
+        uid,
+        photoURL,
+        roomId: selectedRoom.id,
+        displayName,
+      });
+      form.resetFields(["messages"]);
+      setInputValue("");
+    }
   };
+
 
   const condition = useMemo(
     () => ({
@@ -104,7 +113,36 @@ const ChatWindow = () => {
     }),
     [selectedRoom.id]
   )
+  
   const messages = useFirestore('messages', condition);
+
+  const messagesId = messages.map(e => e.id);
+
+  const handleOutRoom = async(uid) => {
+    const roomRef = doc(db, 'rooms', selectedRoom.id);
+
+    await updateDoc(roomRef,{
+        members: [...selectedRoom.members].filter(item => item !== uid),
+       })
+
+    if(uid === selectedRoom.createBy && members.length > 1){
+      const membersNew = members.filter(item => item.uid !== uid)
+      // console.log(members);
+      // console.log(membersNew);
+      await updateDoc(roomRef,{
+        createBy: membersNew[0].uid
+       })
+    }else{
+      const batch = writeBatch(db);
+      messagesId.forEach((docId) => {
+        batch.delete(doc(db, "messages", docId));
+      })
+      await batch.commit();
+      
+      await deleteDoc(doc(db, "rooms", selectedRoom.id));
+      
+    }
+  }
 
   return (
     <div>
@@ -118,12 +156,34 @@ const ChatWindow = () => {
               </span>
             </div>
             <ButtonGroupStyled>
-              <Button
+
+            <Button className="mr-1"
+                icon={<UserDeleteOutlined></UserDeleteOutlined>}
+                onClick={() => handleOutRoom(uid)}
+              >
+                Out
+              </Button>
+
+            {
+              (selectedRoom.createBy === uid) && (
+                <div>
+
+            <Button className="mr-1"
+                icon={<UserDeleteOutlined></UserDeleteOutlined>}
+                onClick={() => setIsRemoveMemberVisible(true)}
+              >
+                Delete
+              </Button>
+              <Button className="mr-5"
                 icon={<UserAddOutlined></UserAddOutlined>}
                 onClick={() => setIsInviteMemberVisible(true)}
               >
                 Add
               </Button>
+                </div>
+              )
+            }
+
               <Avatar.Group size="small" maxCount={2}>
                 {members.map((member) => (
                   <Tooltip title={member.displayName} key={member.id}>

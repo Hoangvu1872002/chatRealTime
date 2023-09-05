@@ -8,6 +8,7 @@ const AppProvider = ({ children }) => {
   const [isAddRoomVisible, setIsAddRoomVisible] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState("");
   const [isInviteMemberVisible, setIsInviteMemberVisible] = useState(false);
+  const [isRemoveMemberVisible, setIsRemoveMemberVisible] = useState(false);
   const { user } = useContext(AuthContext);
 
   const roomsCondition = useMemo(() => {
@@ -47,6 +48,9 @@ const AppProvider = ({ children }) => {
         members,
         isInviteMemberVisible, 
         setIsInviteMemberVisible,
+        isRemoveMemberVisible,
+        setIsRemoveMemberVisible,
+
       }}
     >
       {children}

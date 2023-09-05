@@ -5,6 +5,7 @@ import { debounce, orderBy } from 'lodash';
 import { db } from '../../firebase/config';
 import { AppContext } from '../context/AppProvider';
 import { collection, doc, getDocs, limit, query, updateDoc, where } from 'firebase/firestore';
+import { AuthContext } from '../context/AuthProvider';
 
 function DebounceSelect({
   fetchOptions,
@@ -22,14 +23,14 @@ function DebounceSelect({
       setOptions([]);
       setFetching(true);
 
-      fetchOptions(value, curMembers).then((newOptions) => {
+      fetchOptions(value, curMembers, props.idlogin).then((newOptions) => {
         setOptions(newOptions);
         setFetching(false);
       });
     };
 
     return debounce(loadOptions, debounceTimeout);
-  }, [debounceTimeout, fetchOptions, curMembers]);
+  }, [debounceTimeout, fetchOptions, curMembers, props.idlogin]);
 
   React.useEffect(() => {
     return () => {
@@ -62,9 +63,9 @@ function DebounceSelect({
   );
 }
 
-async function fetchUserList(search, curMembers) {
+async function fetchUserList(search, curMembers, idLogin) {
   const  collectionRef = collection(db, 'users');
-  console.log(collectionRef);
+//   console.log(collectionRef);
   const q = query(collectionRef, where('keywords', 'array-contains', search), limit(20));
   // console.log(q);
   // console.log("c");
@@ -76,24 +77,25 @@ async function fetchUserList(search, curMembers) {
          value: doc.data().uid,
          photoURL: doc.data().photoURL,
        }))
-       .filter((opt) => !curMembers.includes(opt.value))
+       .filter((opt) => (curMembers.filter(item => item !== idLogin)).includes(opt.value))
    })
   return a
 }
 
-export default function InviteMemberModal() {
+export default function RemoveMemberModal() {
   const {
-    isInviteMemberVisible,
-    setIsInviteMemberVisible,
+    isRemoveMemberVisible,
+    setIsRemoveMemberVisible,
     selectedRoomId,
     selectedRoom,
   } = useContext(AppContext);
+  const {user: {uid}} = useContext(AuthContext);
   const [value, setValue] = useState([]);
   const [form] = Form.useForm();
 
   const handleOk = async() => {
-    console.log(value);
-    console.log(selectedRoomId);
+    // console.log(value);
+    // console.log(selectedRoomId);
     // reset form value
     form.resetFields();
     setValue([]);
@@ -105,11 +107,13 @@ export default function InviteMemberModal() {
     // roomRef.update({
     //   members: [...selectedRoom.members, ...value.map((val) => val.value)],
     // });
+    const dataValue = value.map((val) => val.value)
+    console.log(dataValue);
     await updateDoc(roomRef,{
-        members: [...selectedRoom.members, ...value.map((val) => val.value)],
+        members: [...selectedRoom.members].filter(item => !dataValue.includes(item)),
        })
 
-    setIsInviteMemberVisible(false);
+       setIsRemoveMemberVisible(false);
   };
 
   const handleCancel = () => {
@@ -117,14 +121,14 @@ export default function InviteMemberModal() {
     form.resetFields();
     setValue([]);
 
-    setIsInviteMemberVisible(false);
+    setIsRemoveMemberVisible(false);
   };
 
   return (
     <div>
       <Modal
-        title='Mời thêm thành viên'
-        open={isInviteMemberVisible}
+        title='Xóa thành viên'
+        open={isRemoveMemberVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         destroyOnClose={true}
@@ -139,6 +143,7 @@ export default function InviteMemberModal() {
             onChange={(newValue) => setValue(newValue)}
             style={{ width: '100%' }}
             curMembers={selectedRoom.members}
+            idlogin={uid}
           />
         </Form>
       </Modal>

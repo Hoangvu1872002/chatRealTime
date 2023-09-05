@@ -7,6 +7,7 @@ import AuthProvider from './components/context/AuthProvider';
 import AppProvider from './components/context/AppProvider';
 import AddRoomModal from './components/Modal/AddRoomModal';
 import InviteMemberModal from './components/Modal/InviteMemberModal';
+import RemoveMemberModal from './components/Modal/RemoveMemberModal';
 function App() {
   return (
     <Router>
@@ -19,6 +20,7 @@ function App() {
         </Routes> 
         <AddRoomModal></AddRoomModal>      
         <InviteMemberModal></InviteMemberModal>
+        <RemoveMemberModal></RemoveMemberModal>
     </AppProvider>
     </AuthProvider>
     </Router>

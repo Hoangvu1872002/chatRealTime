@@ -1,7 +1,8 @@
-import { Avatar, Typography } from 'antd';
+import { Avatar, Button, Typography } from 'antd';
 import React from 'react';
 import { styled } from 'styled-components';
 import { formatRelative } from 'date-fns/esm';
+import { UndoOutlined } from '@ant-design/icons';
 
 
 const WrapperStyled = styled.div`
@@ -35,7 +36,7 @@ function formatDate(seconds) {
 
   return formattedDate;
 }
-const Message = ({text, displayName, createAt, photoURL}) => {
+const Message = ({text, displayName, createAt, photoURL, handleRetract}) => {
     return (
         <WrapperStyled>
             <div>
@@ -43,8 +44,9 @@ const Message = ({text, displayName, createAt, photoURL}) => {
                 <Typography.Text className='author'>{displayName}</Typography.Text>
                 <Typography.Text className='date'>{formatDate(createAt?.seconds)}</Typography.Text>
             </div>
-            <div>
-                <Typography className='content'>{text}</Typography>
+            <div className='flex items-center'>
+                <Typography className='content bg-sky-400 p-1 rounded-lg'>{text}</Typography>
+                <Button className='rounded-full border-0 ml-5 pt-[4px]  ' onClick={handleRetract} icon = {<UndoOutlined />}></Button>
             </div>
         </WrapperStyled>
     );

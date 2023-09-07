@@ -21,7 +21,6 @@ const PanelStyled = styled(Panel)`
 
     .addRoom {
       color: white;
-      padding: 0;
     }
   }
 `;
@@ -41,8 +40,12 @@ const RoomList = () => {
     return (
         <Collapse  ghost  >
             <PanelStyled header="List room" key = "1" >
-                {rooms?.map(room => <LinkStyled  key = {room.id} onClick={() => setSelectedRoomId(room.id)}>{room.name}</LinkStyled>)}
-                <Button type='text' icon = {<PlusSquareOutlined></PlusSquareOutlined>} className='addRoom'
+                {rooms?.map(room => <LinkStyled className='mt-2'  key = {room.id} onClick={() => setSelectedRoomId(room.id)}>
+                <span className='bg-cyan-100 p-1 rounded-lg text-cyan-900 hover:bg-cyan-300'>
+                {room.name}
+                </span>
+                </LinkStyled>)}
+                <Button type='text' className='addRoom bg-teal-500 mt-3'
                 onClick={handleAddRoom}
                 >Add Room</Button>
             </PanelStyled>

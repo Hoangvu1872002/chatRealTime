@@ -144,6 +144,13 @@ const ChatWindow = () => {
     }
   }
 
+   const handleRetract = async(mesId) => {
+    const conf = window.confirm("Ban co chan chan muon thu hoi");
+    if(conf){
+      await deleteDoc(doc(db, "messages", mesId));
+    }else return
+   }
+
   return (
     <div>
       {selectedRoom.id ? (
@@ -207,6 +214,7 @@ const ChatWindow = () => {
                 photoURL={mes.photoURL}
                 displayName={mes.displayName}
                 createAt={mes.createAt}
+                handleRetract = {() => handleRetract(mes.id)}
               ></Message>
               ))
             }
@@ -221,7 +229,7 @@ const ChatWindow = () => {
                   onPressEnter={handleonSubmit}
                 ></Input>
               </Form.Item>
-              <Button type="primary" onClick={handleonSubmit}>
+              <Button  onClick={handleonSubmit}>
                 Submit
               </Button>
             </FormStyled>

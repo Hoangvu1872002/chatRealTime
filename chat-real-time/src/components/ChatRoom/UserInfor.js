@@ -29,9 +29,11 @@ const UserInfor = () => {
                 <Avatar src = {data.user.photoURL} >{data.user.photoURL ? '' : data.user.displayName?.charAt(0)?.toUpperCase()}</Avatar>
                 <Typography.Text className='userName'>{data.user.displayName}</Typography.Text>
             </div>
+            <div>
             <Button ghost onClick={() =>{
                 signOut(auth)
             }}>Logout</Button>
+            </div>
         
         </WrapperStyled> 
     );

@@ -20,7 +20,7 @@ export default function AddRoomModal() {
       let listNameRoom = [];
        const a = rooms.map(item => item.name);
        listNameRoom = [...listNameRoom, ...a]
-      console.log(listNameRoom);
+      // console.log(listNameRoom);
       const checkName = listNameRoom.find(item => item === form.getFieldsValue().name);
       if(checkName){
         alert('tên phòng đã tồn tại!')

@@ -73,14 +73,17 @@ const MessageListStyled = styled.div`
 `;
 
 const ChatWindow = () => {
-  const { selectedRoom, members, setIsInviteMemberVisible, setIsRemoveMemberVisible } =
-    useContext(AppContext);
+  const {
+    selectedRoom,
+    members,
+    setIsInviteMemberVisible,
+    setIsRemoveMemberVisible,
+  } = useContext(AppContext);
   const {
     user: { uid, photoURL, displayName },
   } = useContext(AuthContext);
 
   const [inputValue, setInputValue] = useState("");
-  
 
   const [form] = Form.useForm();
 
@@ -89,9 +92,9 @@ const ChatWindow = () => {
   };
 
   const handleonSubmit = () => {
-    if(!inputValue){
+    if (!inputValue) {
       alert("bạn chưa nhập tin nhắn!");
-    }else{
+    } else {
       addDocument("messages", {
         text: inputValue,
         uid,
@@ -104,52 +107,51 @@ const ChatWindow = () => {
     }
   };
 
-
   const condition = useMemo(
     () => ({
-      fieldName: 'roomId',
-      operator: '==',
-      compareValue: selectedRoom.id
+      fieldName: "roomId",
+      operator: "==",
+      compareValue: selectedRoom.id,
     }),
     [selectedRoom.id]
-  )
-  
-  const messages = useFirestore('messages', condition);
+  );
 
-  const messagesId = messages.map(e => e.id);
+  const messages = useFirestore("messages", condition);
+  // console.log(messages.map(e => e.uid));
 
-  const handleOutRoom = async(uid) => {
-    const roomRef = doc(db, 'rooms', selectedRoom.id);
+  const messagesId = messages.map((e) => e.id);
 
-    await updateDoc(roomRef,{
-        members: [...selectedRoom.members].filter(item => item !== uid),
-       })
+  const handleOutRoom = async (uid) => {
+    const roomRef = doc(db, "rooms", selectedRoom.id);
 
-    if(uid === selectedRoom.createBy && members.length > 1){
-      const membersNew = members.filter(item => item.uid !== uid)
+    await updateDoc(roomRef, {
+      members: [...selectedRoom.members].filter((item) => item !== uid),
+    });
+
+    if (uid === selectedRoom.createBy && members.length > 1) {
+      const membersNew = members.filter((item) => item.uid !== uid);
       // console.log(members);
       // console.log(membersNew);
-      await updateDoc(roomRef,{
-        createBy: membersNew[0].uid
-       })
-    }else{
+      await updateDoc(roomRef, {
+        createBy: membersNew[0].uid,
+      });
+    } else {
       const batch = writeBatch(db);
       messagesId.forEach((docId) => {
         batch.delete(doc(db, "messages", docId));
-      })
+      });
       await batch.commit();
-      
-      await deleteDoc(doc(db, "rooms", selectedRoom.id));
-      
-    }
-  }
 
-   const handleRetract = async(mesId) => {
+      await deleteDoc(doc(db, "rooms", selectedRoom.id));
+    }
+  };
+
+  const handleRetract = async (mesId) => {
     const conf = window.confirm("Ban co chan chan muon thu hoi");
-    if(conf){
+    if (conf) {
       await deleteDoc(doc(db, "messages", mesId));
-    }else return
-   }
+    } else return;
+  };
 
   return (
     <div>
@@ -163,33 +165,32 @@ const ChatWindow = () => {
               </span>
             </div>
             <ButtonGroupStyled>
-
-            <Button className="mr-1"
+              <Button
+                className="mr-1"
                 icon={<UserDeleteOutlined></UserDeleteOutlined>}
                 onClick={() => handleOutRoom(uid)}
               >
                 Out
               </Button>
 
-            {
-              (selectedRoom.createBy === uid) && (
+              {selectedRoom.createBy === uid && (
                 <div>
-
-            <Button className="mr-1"
-                icon={<UserDeleteOutlined></UserDeleteOutlined>}
-                onClick={() => setIsRemoveMemberVisible(true)}
-              >
-                Delete
-              </Button>
-              <Button className="mr-5"
-                icon={<UserAddOutlined></UserAddOutlined>}
-                onClick={() => setIsInviteMemberVisible(true)}
-              >
-                Add
-              </Button>
+                  <Button
+                    className="mr-1"
+                    icon={<UserDeleteOutlined></UserDeleteOutlined>}
+                    onClick={() => setIsRemoveMemberVisible(true)}
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    className="mr-5"
+                    icon={<UserAddOutlined></UserAddOutlined>}
+                    onClick={() => setIsInviteMemberVisible(true)}
+                  >
+                    Add
+                  </Button>
                 </div>
-              )
-            }
+              )}
 
               <Avatar.Group size="small" maxCount={2}>
                 {members.map((member) => (
@@ -206,18 +207,18 @@ const ChatWindow = () => {
           </HeaderStyled>
           <ContentStyled>
             <MessageListStyled>
-            {
-              messages.map(mes => (
+              {messages.map((mes) => (
                 <Message
-                key ={mes.id}
-                text={mes.text}
-                photoURL={mes.photoURL}
-                displayName={mes.displayName}
-                createAt={mes.createAt}
-                handleRetract = {() => handleRetract(mes.id)}
-              ></Message>
-              ))
-            }
+                  key={mes.id}
+                  text={mes.text}
+                  mesUid={mes.uid}
+                  uid={uid}
+                  photoURL={mes.photoURL}
+                  displayName={mes.displayName}
+                  createAt={mes.createAt}
+                  handleRetract={() => handleRetract(mes.id)}
+                ></Message>
+              ))}
             </MessageListStyled>
             <FormStyled form={form}>
               <Form.Item name="messages">
@@ -229,9 +230,7 @@ const ChatWindow = () => {
                   onPressEnter={handleonSubmit}
                 ></Input>
               </Form.Item>
-              <Button  onClick={handleonSubmit}>
-                Submit
-              </Button>
+              <Button onClick={handleonSubmit}>Submit</Button>
             </FormStyled>
           </ContentStyled>
         </WrapperStyled>

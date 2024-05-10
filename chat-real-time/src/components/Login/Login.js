@@ -16,7 +16,7 @@ const Login = () => {
   const handleFbLogin =  async(provider) => {
     // auth.signInWithPopup()
     const data = await signInWithPopup(auth, provider).then(console.log("aaa"));
-    console.log(data);
+    // console.log(data);
     if(data?._tokenResponse.isNewUser){
       addDocument("users",{    
           displayName: data.user.displayName,

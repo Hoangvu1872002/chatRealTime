@@ -92,8 +92,8 @@ export default function InviteMemberModal() {
   const [form] = Form.useForm();
 
   const handleOk = async() => {
-    console.log(value);
-    console.log(selectedRoomId);
+    // console.log(value);
+    // console.log(selectedRoomId);
     // reset form value
     form.resetFields();
     setValue([]);

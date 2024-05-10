@@ -108,7 +108,7 @@ export default function RemoveMemberModal() {
     //   members: [...selectedRoom.members, ...value.map((val) => val.value)],
     // });
     const dataValue = value.map((val) => val.value)
-    console.log(dataValue);
+    // console.log(dataValue);
     await updateDoc(roomRef,{
         members: [...selectedRoom.members].filter(item => !dataValue.includes(item)),
        })

@@ -1,9 +1,8 @@
-import { Avatar, Button, Typography } from 'antd';
-import React from 'react';
-import { styled } from 'styled-components';
-import { formatRelative } from 'date-fns/esm';
-import { UndoOutlined } from '@ant-design/icons';
-
+import { Avatar, Button, Typography } from "antd";
+import React from "react";
+import { styled } from "styled-components";
+import { formatRelative } from "date-fns/esm";
+import { UndoOutlined } from "@ant-design/icons";
 
 const WrapperStyled = styled.div`
   margin-bottom: 10px;
@@ -25,7 +24,7 @@ const WrapperStyled = styled.div`
 `;
 
 function formatDate(seconds) {
-  let formattedDate = '';
+  let formattedDate = "";
 
   if (seconds) {
     formattedDate = formatRelative(new Date(seconds * 1000), new Date());
@@ -36,20 +35,41 @@ function formatDate(seconds) {
 
   return formattedDate;
 }
-const Message = ({text, displayName, createAt, photoURL, handleRetract}) => {
-    return (
-        <WrapperStyled>
-            <div>
-                <Avatar  size='smal' src = {photoURL}>{photoURL ? '' : displayName?.charAt(0)?.toUpperCase()}</Avatar>
-                <Typography.Text className='author'>{displayName}</Typography.Text>
-                <Typography.Text className='date'>{formatDate(createAt?.seconds)}</Typography.Text>
-            </div>
-            <div className='flex items-center'>
-                <Typography className='content bg-sky-400 p-1 rounded-lg'>{text}</Typography>
-                <Button className='rounded-full border-0 ml-5 pt-[4px]  ' onClick={handleRetract} icon = {<UndoOutlined />}></Button>
-            </div>
-        </WrapperStyled>
-    );
+const Message = ({
+  text,
+  displayName,
+  createAt,
+  photoURL,
+  handleRetract,
+  uid,
+  mesUid,
+}) => {
+  // console.log({ uid, mesUid });
+  return (
+    <WrapperStyled>
+      <div>
+        <Avatar size="smal" src={photoURL}>
+          {photoURL ? "" : displayName?.charAt(0)?.toUpperCase()}
+        </Avatar>
+        <Typography.Text className="author">{displayName}</Typography.Text>
+        <Typography.Text className="date">
+          {formatDate(createAt?.seconds)}
+        </Typography.Text>
+      </div>
+      <div className="flex items-center">
+        <Typography className="content bg-sky-400 p-1 rounded-lg">
+          {text}
+        </Typography>
+        {uid === mesUid && (
+          <Button
+            className="rounded-full border-0 ml-5 pt-[4px]  "
+            onClick={handleRetract}
+            icon={<UndoOutlined />}
+          ></Button>
+        )}
+      </div>
+    </WrapperStyled>
+  );
 };
 
 export default Message;

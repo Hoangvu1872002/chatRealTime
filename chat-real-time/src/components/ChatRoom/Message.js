@@ -3,6 +3,7 @@ import React from "react";
 import { styled } from "styled-components";
 import { formatRelative } from "date-fns/esm";
 import { UndoOutlined } from "@ant-design/icons";
+import { clsx } from "clsx";
 
 const WrapperStyled = styled.div`
   margin-bottom: 10px;
@@ -57,7 +58,12 @@ const Message = ({
         </Typography.Text>
       </div>
       <div className="flex items-center">
-        <Typography className="content bg-sky-400 p-1 rounded-lg">
+        <Typography
+          className={clsx(
+            "content  p-1 rounded-lg text-white px-2 font-medium border shadow-md",
+            uid === mesUid ? " bg-orange-400" : "bg-sky-400"
+          )}
+        >
           {text}
         </Typography>
         {uid === mesUid && (
